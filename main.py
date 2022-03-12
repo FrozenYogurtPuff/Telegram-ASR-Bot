@@ -146,7 +146,10 @@ class ASRBot:
     def send_if_set(update: Update, context: CallbackContext):
         def send_msg(var: str):
             if var:
-                context.bot.send_message(chat_id=update.effective_chat.id, text=var)
+                return context.bot.send_message(
+                    chat_id=update.effective_chat.id, text=var
+                )
+            return None
 
         return send_msg
 
@@ -170,26 +173,19 @@ class ASRBot:
                 send_msg(self._deny_bot_msg)
 
             else:
-                if self._placeholder_msg:
-                    msg = context.bot.send_message(
-                        chat_id=update.effective_chat.id, text=self._placeholder_msg
-                    )
+                msg = send_msg(self._placeholder_msg)
 
-                    buf = self.get_voice_buffer(update.message.voice)
-                    result = self.recognizer.recognize(buf)
+                buf = self.get_voice_buffer(update.message.voice)
+                result = self.recognizer.recognize(buf)
 
+                if msg:
                     context.bot.editMessageText(
                         chat_id=update.effective_chat.id,
                         message_id=msg.message_id,
                         text=result,
                     )
                 else:
-                    buf = self.get_voice_buffer(update.message.voice)
-                    result = self.recognizer.recognize(buf)
-
-                    context.bot.send_message(
-                        chat_id=update.effective_chat.id, text=result
-                    )
+                    send_msg(result)
 
         start_handler = CommandHandler("start", start)
         self.dispatcher.add_handler(start_handler)
