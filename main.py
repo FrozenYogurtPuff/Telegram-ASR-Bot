@@ -44,20 +44,23 @@ def parse_env():
     is_allow_group = env.bool("ALLOW_GROUP", True)
     is_whitelist = env.bool("ENABLE_GROUP_WHITELIST", False)
     whitelist_ids = env.list("GROUP_WHITELIST", subcast=int) if is_whitelist else None
-    handle_bot_voice = env.bool("HANDLE_BOT_VOICE", False)
+    accept_bot = env.bool("ACCEPT_BOT_VOICE", False)
+    accept_fwd = env.bool("ACCEPT_FORWARD_VOICE", False)
 
     bot_options = {
         "private": is_allow_private,
         "group": is_allow_group,
         "whitelist": is_whitelist,
         "whitelist_ids": whitelist_ids,
-        "handle_bot": handle_bot_voice,
+        "accept_bot": accept_bot,
+        "accept_fwd": accept_fwd,
     }
 
     start_msg = env.str("START_MSG", None)
     not_allowed_msg = env.str("NOT_ALLOWED_MSG", None)
     not_white_msg = env.str("NOT_IN_WHITELIST_MSG", None)
-    deny_bot_msg = env.str("NOT_HANDLE_BOT_MSG", None)
+    deny_bot_msg = env.str("DENY_BOT_MSG", None)
+    deny_fwd_msg = env.str("DENY_FORWARD_MSG", None)
     placeholder_msg = env.str("PLACEHOLDER_MSG", None)
     clear_msg = env.str("CLEAR_MSG", None)
 
@@ -66,6 +69,7 @@ def parse_env():
         "not_allowed": not_allowed_msg,
         "not_white": not_white_msg,
         "deny_bot": deny_bot_msg,
+        "deny_fwd": deny_fwd_msg,
         "placeholder": placeholder_msg,
         "clear": clear_msg,
     }
@@ -153,12 +157,14 @@ class ASRBot:
         self._allow_group = options["group"]
         self._whitelist = options["private"]
         self._whitelist_id = options["whitelist_ids"]
-        self._handle_bot = options["handle_bot"]
+        self._accept_bot = options["accept_bot"]
+        self._accept_fwd = options["accept_fwd"]
 
         self._start_msg = messages["start"]
         self._not_allowed_msg = messages["not_allowed"]
         self._not_white_msg = messages["not_white"]
         self._deny_bot_msg = messages["deny_bot"]
+        self._deny_fwd_msg = messages["deny_fwd"]
         self._placeholder_msg = messages["placeholder"]
         self._clear_msg = messages["clear"]
 
@@ -236,8 +242,11 @@ class ASRBot:
             elif self._whitelist and update.effective_chat.id not in self._whitelist_id:
                 send_msg(self._not_white_msg)
 
-            elif not self._handle_bot and update.effective_user.is_bot:
+            elif not self._accept_bot and update.effective_user.is_bot:
                 send_msg(self._deny_bot_msg)
+
+            elif not self._accept_fwd and update.message.forward_from:
+                send_msg(self._deny_fwd_msg)
 
             else:
                 msg = send_msg(self._placeholder_msg)
