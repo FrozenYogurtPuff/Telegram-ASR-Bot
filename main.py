@@ -1,4 +1,6 @@
 import logging
+import functools
+from typing import Optional
 
 from environs import Env, EnvError
 
@@ -140,46 +142,34 @@ class ASRBot:
     def get_voice_buffer(voice: Voice) -> bytes:
         return bytes(voice.get_file().download_as_bytearray())
 
+    @staticmethod
+    def send_if_set(update: Update, context: CallbackContext):
+        def send_msg(var: str):
+            if var:
+                context.bot.send_message(chat_id=update.effective_chat.id, text=var)
+
+        return send_msg
+
     def register(self):
         def start(update: Update, context: CallbackContext):
-            if self._start_msg:
-                context.bot.send_message(
-                    chat_id=update.effective_chat.id, text=self._start_msg
-                )
+            self.send_if_set(update, context)(self._start_msg)
 
         def listen(update: Update, context: CallbackContext):
-            exclude = False
+            send_msg = self.send_if_set(update, context)
 
             if not self._allow_group and update.effective_chat.type.endswith("group"):
-                if self._not_allowed_msg:
-                    context.bot.send_message(
-                        chat_id=update.effective_chat.id, text=self._not_allowed_msg
-                    )
-                exclude = True
+                send_msg(self._not_allowed_msg)
 
-            if not self._allow_private and update.effective_chat.type == "private":
-                if self._not_allowed_msg:
-                    context.bot.send_message(
-                        chat_id=update.effective_chat.id, text=self._not_allowed_msg
-                    )
-                exclude = True
+            elif not self._allow_private and update.effective_chat.type == "private":
+                send_msg(self._not_allowed_msg)
 
-            if self._whitelist and update.effective_chat.id not in self._whitelist_id:
-                if self._not_white_msg:
-                    context.bot.send_message(
-                        chat_id=update.effective_chat.id, text=self._not_white_msg
-                    )
-                exclude = True
+            elif self._whitelist and update.effective_chat.id not in self._whitelist_id:
+                send_msg(self._not_white_msg)
 
-            if not self._handle_bot and update.effective_user.is_bot:
-                print(update.effective_user)
-                if self._deny_bot_msg:
-                    context.bot.send_message(
-                        chat_id=update.effective_chat.id, text=self._deny_bot_msg
-                    )
-                exclude = True
+            elif not self._handle_bot and update.effective_user.is_bot:
+                send_msg(self._deny_bot_msg)
 
-            if not exclude:
+            else:
                 if self._placeholder_msg:
                     msg = context.bot.send_message(
                         chat_id=update.effective_chat.id, text=self._placeholder_msg
