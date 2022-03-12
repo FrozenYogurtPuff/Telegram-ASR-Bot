@@ -64,6 +64,11 @@ def parse_env():
     placeholder_msg = env.str("PLACEHOLDER_MSG", None)
     clear_msg = env.str("CLEAR_MSG", None)
 
+    try:
+        empty_result_msg = env.str("EMPTY_RESULT_MSG")
+    except EnvError:
+        raise ConfigNotFound("Empty result message is unset.")
+
     msg = {
         "start": start_msg,
         "not_allowed": not_allowed_msg,
@@ -72,6 +77,7 @@ def parse_env():
         "deny_fwd": deny_fwd_msg,
         "placeholder": placeholder_msg,
         "clear": clear_msg,
+        "empty_result": empty_result_msg,
     }
 
     try:
@@ -167,6 +173,7 @@ class ASRBot:
         self._deny_fwd_msg = messages["deny_fwd"]
         self._placeholder_msg = messages["placeholder"]
         self._clear_msg = messages["clear"]
+        self._empty_result_msg = messages["empty_result"]
 
         self.updater = Updater(token=self._tg_api_key, use_context=True)
         self.dispatcher = self.updater.dispatcher
@@ -201,7 +208,7 @@ class ASRBot:
     @staticmethod
     def send_if_set(update: Update, context: CallbackContext):
         def send_msg(var: str):
-            if var:
+            if var and len(var):
                 return context.bot.send_message(
                     chat_id=update.effective_chat.id, text=var
                 )
@@ -255,6 +262,9 @@ class ASRBot:
                 sample_rate = self.get_sample_rate(filepath, self.media_parser)
                 self.recognizer.set_sample_rate(sample_rate)
                 result = self.recognizer.recognize(filepath)
+
+                if not len(result):
+                    result = self._empty_result_msg
 
                 if msg:
                     context.bot.editMessageText(
