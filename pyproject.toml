@@ -9,6 +9,7 @@ python = "^3.9"
 python-telegram-bot = "^13.11"
 google-cloud-speech = "^2.13.1"
 environs = "^9.5.0"
+PyProbe = "^0.1.2"
 
 [tool.poetry.dev-dependencies]
 jupyter = "^1.0.0"
