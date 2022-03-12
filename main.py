@@ -177,9 +177,6 @@ class ASRBot:
     def get_voice_path(voice: Voice) -> str:
         filename = str(uuid.uuid4().hex) + ".ogg"
         base_relative = Path("voice")
-
-        if not base_relative.exists():
-            base_relative.mkdir()
         base_path = base_relative.resolve(strict=True)
 
         full_path = str(base_path / filename)
@@ -217,8 +214,11 @@ class ASRBot:
         Path(path).unlink(missing_ok=True)
 
     @staticmethod
-    def clear_voice_cache() -> None:
+    def initial_voice_cache() -> None:
         base_path = Path("voice")
+        if not base_path.exists():
+            base_path.mkdir()
+
         for child_path in base_path.iterdir():
             child_path.unlink()
 
@@ -227,7 +227,7 @@ class ASRBot:
             self.send_if_set(update, context)(self._start_msg)
 
         def clear(update: Update, context: CallbackContext):
-            self.clear_voice_cache()
+            self.initial_voice_cache()
             self.send_if_set(update, context)(self._clear_msg)
 
         def listen(update: Update, context: CallbackContext):
@@ -277,7 +277,7 @@ class ASRBot:
         self.dispatcher.add_handler(clear_handler)
 
     def start(self):
-        self.clear_voice_cache()
+        self.initial_voice_cache()
         self.updater.start_polling()
 
 
