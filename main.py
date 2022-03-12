@@ -1,16 +1,17 @@
 import logging
-import functools
-from typing import Optional
 
 from environs import Env, EnvError
 
-from telegram import Update, Voice
-from telegram.ext import CallbackContext
-from telegram.ext import CommandHandler
-from telegram.ext import Updater
-from telegram.ext import MessageHandler, Filters
-
 from google.cloud import speech_v1p1beta1 as speech
+
+from telegram import Update, Voice
+from telegram.ext import (
+    CallbackContext,
+    CommandHandler,
+    Filters,
+    MessageHandler,
+    Updater,
+)
 
 
 class ConfigNotFound(Exception):
