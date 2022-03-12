@@ -15,7 +15,7 @@ from telegram.ext import (
 )
 from pathlib import Path
 
-from pyprobe import VideoFileParser as MediaParser
+from pymediainfo import MediaInfo
 
 
 class ConfigNotFound(Exception):
@@ -155,13 +155,12 @@ class ASRBot:
         options: dict,
         messages: dict,
         recognizer: GcloudASR,
-        media_parser: MediaParser,
     ):
         self._tg_api_key = tg_api_key
 
         self._allow_private = options["private"]
         self._allow_group = options["group"]
-        self._whitelist = options["private"]
+        self._whitelist = options["whitelist"]
         self._whitelist_id = options["whitelist_ids"]
         self._accept_bot = options["accept_bot"]
         self._accept_fwd = options["accept_fwd"]
@@ -177,7 +176,6 @@ class ASRBot:
 
         self.updater = Updater(token=self._tg_api_key, use_context=True)
         self.dispatcher = self.updater.dispatcher
-        self.media_parser = media_parser
         self.recognizer = recognizer
 
     @staticmethod
@@ -192,13 +190,13 @@ class ASRBot:
         return full_path
 
     @staticmethod
-    def get_sample_rate(path: str, probe: MediaParser) -> int:
+    def get_sample_rate(path: str) -> int:
         if not Path(path).exists():
             raise VoiceNotFound(f"Path: {path}")
-        result_dict = probe.parseFfprobe(path)
+        media_info = MediaInfo.parse(path)
 
         try:
-            sample_rate = result_dict["audios"][0]["sample_rate"]
+            sample_rate = media_info.audio_tracks[0].sampling_rate
         except KeyError:
             logging.error("Parse sample_rate error, fallback to 48000Hz.")
             sample_rate = 48000
@@ -238,6 +236,7 @@ class ASRBot:
             self.send_if_set(update, context)(self._clear_msg)
 
         def listen(update: Update, context: CallbackContext):
+
             send_msg = self.send_if_set(update, context)
 
             if not self._allow_group and update.effective_chat.type.endswith("group"):
@@ -259,7 +258,7 @@ class ASRBot:
                 msg = send_msg(self._placeholder_msg)
 
                 filepath = self.get_voice_path(update.message.voice)
-                sample_rate = self.get_sample_rate(filepath, self.media_parser)
+                sample_rate = self.get_sample_rate(filepath)
                 self.recognizer.set_sample_rate(sample_rate)
                 result = self.recognizer.recognize(filepath)
 
@@ -294,7 +293,6 @@ class ASRBot:
 if __name__ == "__main__":
     TG_API_KEY, BOT_OPT, ASR_OPT, MSG = parse_env()
     asr = GcloudASR(ASR_OPT)
-    parser = MediaParser()
-    bot = ASRBot(TG_API_KEY, BOT_OPT, MSG, asr, parser)
+    bot = ASRBot(TG_API_KEY, BOT_OPT, MSG, asr)
     bot.register()
     bot.start()

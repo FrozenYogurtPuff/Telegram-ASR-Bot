@@ -913,6 +913,14 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "pymediainfo"
+version = "5.1.0"
+description = "A Python wrapper for the mediainfo library."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "pyparsing"
 version = "3.0.7"
 description = "Python parsing module"
@@ -922,14 +930,6 @@ python-versions = ">=3.6"
 
 [package.extras]
 diagrams = ["jinja2", "railroad-diagrams"]
-
-[[package]]
-name = "pyprobe"
-version = "0.1.2"
-description = "Extract metadata from video files using ffprobe or mediainfo"
-category = "main"
-optional = false
-python-versions = ">=3"
 
 [[package]]
 name = "pyrsistent"
@@ -1267,7 +1267,7 @@ notebook = ">=4.4.1"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "594e2b8cfb4e7f115ea555f04cdfd522d855ae2b6751694c78cb4e98fa367bdb"
+content-hash = "f7a1eeb3b1a73e4b519c832945b2b92a1fa59ddb46883d59e4864655e18c6b17"
 
 [metadata.files]
 appnope = [
@@ -1784,12 +1784,15 @@ pygments = [
     {file = "Pygments-2.11.2-py3-none-any.whl", hash = "sha256:44238f1b60a76d78fc8ca0528ee429702aae011c265fe6a8dd8b63049ae41c65"},
     {file = "Pygments-2.11.2.tar.gz", hash = "sha256:4e426f72023d88d03b2fa258de560726ce890ff3b630f88c21cbb8b2503b8c6a"},
 ]
+pymediainfo = [
+    {file = "pymediainfo-5.1.0-py3-none-macosx_10_9_x86_64.whl", hash = "sha256:99bd7e562dc2040c7c60f7a57a603be964c95e2d6b34684fdc5c6046c12dba71"},
+    {file = "pymediainfo-5.1.0-py3-none-win32.whl", hash = "sha256:5df10ff7d65631a68f80846f91b06d8844cc307588788443f1716c7543d4ff8e"},
+    {file = "pymediainfo-5.1.0-py3-none-win_amd64.whl", hash = "sha256:ffba87bbac9b020526d34b7aef3094b6e9afb23b208051ffef0fbd4833007455"},
+    {file = "pymediainfo-5.1.0.tar.gz", hash = "sha256:d996c69d50081a24d6dca9679abf43ffd2be368b065f953c2c9082e5d649c734"},
+]
 pyparsing = [
     {file = "pyparsing-3.0.7-py3-none-any.whl", hash = "sha256:a6c06a88f252e6c322f65faf8f418b16213b51bdfaece0524c1c1bc30c63c484"},
     {file = "pyparsing-3.0.7.tar.gz", hash = "sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea"},
-]
-pyprobe = [
-    {file = "PyProbe-0.1.2.tar.gz", hash = "sha256:3c4b0b7cb008851f3bd2629702bcf54f62d5284ee0556069cdbf1097f6866ce9"},
 ]
 pyrsistent = [
     {file = "pyrsistent-0.18.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:df46c854f490f81210870e509818b729db4488e1f30f2a1ce1698b2295a878d1"},
