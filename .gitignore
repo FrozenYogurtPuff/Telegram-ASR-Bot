@@ -2,3 +2,4 @@
 .env
 credentials
 voice
+__pycache__
