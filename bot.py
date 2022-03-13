@@ -152,4 +152,5 @@ class ASRBot:
 
     def start(self):
         VoiceManager.initial_voice_cache(self._delete)
-        self.updater.start_polling()
+        self.updater.start_polling(drop_pending_updates=True)
+        self.updater.idle()
