@@ -10,6 +10,7 @@ python-telegram-bot = "^13.11"
 google-cloud-speech = "^2.13.1"
 environs = "^9.5.0"
 pymediainfo = "^5.1.0"
+google-cloud-storage = "^2.1.0"
 
 [tool.poetry.dev-dependencies]
 jupyter = "^1.0.0"
